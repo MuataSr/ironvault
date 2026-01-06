@@ -1,0 +1,175 @@
+Since you are using an AI Agent you shouldn't try to "convert" the whole app at once. That leads to hallucinations.
+
+Instead, we will build this component-by-component using the "Reference & Rewrite" method. We will use the logic from a Kotlin open-source project (like PassVault) as the reference, but write fresh ArkTS code.
+
+Here is your Step-by-Step Action Plan.
+
+Phase 1: The Blueprint (Data Structure)
+Goal: Define what a "Password Entry" looks like in ArkTS.
+
+You need to tell your agent exactly what data we are storing before we build anything else.
+
+Action: Open your IDE (Cursor/DevEco) and create a file named VaultModel.ets. Copy/Paste this Prompt into your Agent:
+
+Prompt: "I am building a native HarmonyOS NEXT app called IronVault. It is an offline password manager.
+
+First, I need the Data Model. Please generate a TypeScript interface (ArkTS) named PasswordEntry.
+
+It should include fields for:
+
+id (number, auto-increment equivalent)
+
+title (string, e.g., 'Google')
+
+username (string)
+
+encryptedPassword (string)
+
+websiteUrl (string, optional)
+
+category (string, e.g., 'Social', 'Banking')
+
+createdAt (number, timestamp)
+
+updatedAt (number, timestamp)
+
+Also, generate a simple 'Mock Data' array with 3 dummy entries so I can test the UI later."
+
+Phase 2: The "Iron" (Encryption Layer)
+Goal: Build the security utility that encrypts the data BEFORE it hits the database.
+
+HarmonyOS NEXT uses the @ohos.security.cryptoFramework. This is the hardest part to get right, so we do it early.
+
+Action: Create a file named CryptoUtils.ets. Copy/Paste this Prompt into your Agent:
+
+Prompt: "Now I need a security utility class to handle encryption.
+
+create a class named CryptoManager using the native HarmonyOS library @ohos.security.cryptoFramework.
+
+It needs two main static methods:
+
+encrypt(plainText: string, key: string): Promise<string>
+
+decrypt(cipherText: string, key: string): Promise<string>
+
+Requirements:
+
+Use AES-GCM algorithm (256-bit).
+
+The output should be a Base64 string that combines the IV (Initialization Vector) and the CipherText so it's easy to store.
+
+Handle errors gracefully (try/catch)."
+
+Phase 3: The "Vault" (Database Layer)
+Goal: Create the local database that stores the encrypted strings.
+
+HarmonyOS uses @ohos.data.relationalStore (which is basically SQLite).
+
+Action: Create a file named DatabaseManager.ets. Copy/Paste this Prompt into your Agent:
+
+Prompt: "I need a database manager to persist the data locally. We are using @ohos.data.relationalStore.
+
+Create a class VaultDatabase that follows the Singleton pattern.
+
+It should have these functions:
+
+init(): Initialize the RDB store and create the table 'passwords' if it doesn't exist.
+
+addEntry(entry: PasswordEntry): Promise<number>
+
+getAllEntries(): Promise<PasswordEntry[]>
+
+deleteEntry(id: number): Promise<void>
+
+Crucial: Ensure the addEntry function maps the ArkTS interface correctly to the database columns."
+
+Phase 4: The Master Key (Login Screen)
+Goal: The first screen user sees. It must unlock the app.
+
+Now we move to ArkUI (the visual part).
+
+Action: Create a file named LoginRequestView.ets. Copy/Paste this Prompt into your Agent:
+
+Prompt: "Now let's build the UI. I need a 'Master Password' login screen using ArkUI.
+
+Visual Style: Clean, minimalist, dark mode friendly.
+
+Elements:
+
+A central logo or icon (use a placeholder).
+
+A TextInput field for the Master Password (type: Password) with a placeholder 'Enter Master Key'.
+
+A 'Unlock Vault' button.
+
+Logic:
+
+When the button is clicked, check if the input is not empty.
+
+(For now) just log 'Vault Unlocked' to the console and navigate to the Home Page if successful."
+
+Phase 5: The List (Main Dashboard)
+Goal: Display the list of accounts.
+
+Action: Create a file named VaultHomeView.ets. Copy/Paste this Prompt into your Agent:
+
+Prompt: "Create the main dashboard screen VaultHomeView.
+
+Layout:
+
+A List container that displays the PasswordEntry items.
+
+Each list item should show the 'Title' (bold) and 'Username' (gray/smaller). Do NOT show the password.
+
+A 'Floating Action Button' (FAB) or a '+' button in the corner to add a new entry.
+
+Logic:
+
+Use the Mock Data we generated in Phase 1 to populate the list for now.
+
+Add a 'copy to clipboard' icon next to each username."
+
+Phase 6: The "Add Entry" Form
+Goal: Inputting new passwords.
+
+Action: Create a file named AddEntryDialog.ets (or View). Copy/Paste this Prompt into your Agent:
+
+Prompt: "Create a Custom Dialog or a new Page for adding a new password.
+
+Fields:
+
+Title (Input)
+
+Username (Input)
+
+Password (Input - with a visibility toggle eye icon)
+
+Category (Select/Dropdown: 'Work', 'Personal', 'Finance')
+
+Logic:
+
+When 'Save' is clicked, it should gather the data into a PasswordEntry object.
+
+Call the CryptoManager.encrypt method on the password field before console logging the final object."
+
+Phase 7: Wiring it all together
+Goal: Replacing Mock Data with Real Data.
+
+Once you have all those files created, your final prompt links them up.
+
+Action: Open VaultHomeView.ets. Copy/Paste this Prompt into your Agent:
+
+Prompt: "I want to refactor VaultHomeView to use real data.
+
+Import VaultDatabase and CryptoManager.
+
+In the aboutToAppear() lifecycle method, call VaultDatabase.getAllEntries() and update the state variable for the list.
+
+Update the 'Add Entry' logic so that when a user saves a new password, it encrypts the password using CryptoManager, saves it to VaultDatabase, and refreshes the list."
+
+Summary Checklist for You
+Don't Paste the Kotlin Code: Since you are building native HarmonyOS, it is often better to describe the logic (as done above) than to paste raw Kotlin code, which might confuse the agent into writing "Java-style" ArkTS.
+
+Test the Encryption Early: Before you build the UI, write a simple script to test that encrypt("password") -> decrypt(result) returns "password". If this fails, the app is useless.
+
+The "Local" Edge: Once this works, you have a functional, offline, encrypted password manager that you can distribute as a .hap file on your website.

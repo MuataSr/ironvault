@@ -1,0 +1,7 @@
+{
+  "src": [
+    "view/LoginView",
+    "pages/VaultHomeView",
+    "view/AddEntryView"
+  ]
+}

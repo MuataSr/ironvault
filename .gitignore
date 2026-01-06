@@ -1,0 +1,25 @@
+# HarmonyOS/OpenHarmony SDK
+open-harmonyOS-sdk/
+ohpm-repo-5.4.1.0/
+HarmonyOS-mcp-server/harmonyos-sdk/
+
+# Build outputs
+entry/build/
+entry/.ark_cache/
+.hvigor/outputs/
+build/
+
+# Node modules
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

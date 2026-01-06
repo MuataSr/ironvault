@@ -1,0 +1,90 @@
+name: Build IronVault
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Download HarmonyOS SDK
+        run: |
+          mkdir -p $HOME/harmonyos-sdk
+          cd $HOME/harmonyos-sdk
+          # Download command line tools
+          wget -q https://developer.huawei.com/consumer/en/sdk/command-line-tools-linux-5.0.3.XXX.zip
+          unzip -q command-line-tools-linux-*.zip
+          rm command-line-tools-linux-*.zip
+          mkdir -p command-line-tools/sdk/default/openharmony
+          # Download toolchains
+          wget -q https://gitee.com/openharmony/commandline-tools/releases/download/v6.0.0/toolchains-linux-x64-6.0.0.47-Beta1.zip
+          unzip -q toolchains-linux-x64-*.zip -d command-line-tools/sdk/default/openharmony
+          rm toolchains-linux-x64-*.zip
+
+      - name: Configure Environment
+        run: |
+          export PATH=$HOME/harmonyos-sdk/command-line-tools/bin:$PATH
+          export NODE_HOME=$HOME/.nvm/versions/node/v18.*
+          export HDC_HOME=$HOME/harmonyos-sdk/command-line-tools/sdk/default/openharmony/toolchains
+          echo "PATH=$PATH" >> $GITHUB_ENV
+          echo "HDC_HOME=$HDC_HOME" >> $GITHUB_ENV
+
+      - name: Configure npm for HarmonyOS
+        run: |
+          npm config set registry https://repo.huaweicloud.com/repository/npm/
+          npm config set @ohos:registry https://repo.huaweicloud.com/repository/npm/
+
+      - name: Install Dependencies
+        run: |
+          cd ${{ github.workspace }}
+          npm install
+
+      - name: Build HAP
+        id: build
+        run: |
+          cd ${{ github.workspace }}
+          export PATH=$HOME/harmonyos-sdk/command-line-tools/bin:$PATH
+          export NODE_HOME=$HOME/.nvm/versions/node/v18.*
+          export HDC_HOME=$HOME/harmonyos-sdk/command-line-tools/sdk/default/openharmony/toolchains
+
+          # Try to build
+          if [ -f "hvigorw" ]; then
+            chmod +x hvigorw
+            ./hvigorw assembleHap --mode module -p product=default --no-daemon
+          else
+            echo "Build skipped: hvigorw not configured"
+          fi
+
+      - name: Upload HAP Artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ironvault-hap
+          path: |
+            entry/build/default/outputs/default/*.hap
+            !**/node_modules/**
+          retention-days: 7
+
+      - name: List Build Outputs
+        if: always()
+        run: |
+          ls -la ${{ github.workspace }}/entry/build/default/outputs/default/ 2>/dev/null || echo "No build outputs found"

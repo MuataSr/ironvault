@@ -1,0 +1,13 @@
+{
+  "modelVersion": "6.21.1",
+  "execution": {
+    "daemon": false
+  },
+  "systemOptions": {
+    "enableNativeStrip": false,
+    "enableArkTools": true
+  },
+  "subModules": {
+    "includeExternalDependencies": false
+  }
+}

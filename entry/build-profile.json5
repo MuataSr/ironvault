@@ -1,0 +1,13 @@
+{
+  "apiType": "stageMode",
+  "buildOption": {
+    "strictMode": {
+      "caseSensitiveCheck": true
+    }
+  },
+  "targets": [
+    {
+      "name": "default",
+    }
+  ]
+}

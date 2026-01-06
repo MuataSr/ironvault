@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@ohos/arkui": "5.0.0",
+    "@ohos/hypium": "1.0.0"
+  }
+}

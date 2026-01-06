@@ -1,0 +1,17 @@
+{
+  "name": "ironvault",
+  "version": "1.0.0",
+  "description": "HarmonyOS Password Manager",
+  "ohos": {
+    "org": "huawei",
+    "directory": "hvigor"
+  },
+  "dependencies": {
+    "@ohos/hvigor-ohos-plugin": "file:./HarmonyOS-mcp-server/harmonyos-sdk/command-line-tools/hvigor/hvigor-ohos-plugin"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "hvigorw assembleHap --mode module -p product=default",
+    "clean": "hvigorw clean --no-daemon"
+  }
+}
