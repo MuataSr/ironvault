@@ -31,14 +31,14 @@ jobs:
           mkdir -p $HOME/openharmony-sdk
           cd $HOME/openharmony-sdk
 
-          # Download OpenHarmony command-line tools from Gitee
-          wget -q https://gitee.com/openharmony/commandline-tools/releases/download/v6.0.0/commandline-tools-linux-x64-6.0.0.47.zip
+          # Download OpenHarmony command-line tools from mirror
+          wget -q --timeout=60 https://mirrors.huaweicloud.com/openharmony/6.0.0-RC1/standard_rc1_official_release/command_line_tools/linux/commandline-tools-linux-x64-6.0.0.47.zip
           unzip -q commandline-tools-linux-x64-6.0.0.47.zip
           rm commandline-tools-linux-x64-6.0.0.47.zip
 
           # Download toolchains
           mkdir -p commandline-tools/sdk/default/openharmony
-          wget -q https://gitee.com/openharmony/commandline-tools/releases/download/v6.0.0/toolchains-linux-x64-6.0.0.47.zip
+          wget -q --timeout=60 https://mirrors.huaweicloud.com/openharmony/6.0.0-RC1/standard_rc1_official_release/compiler_and_runtime/linux/toolchains-linux-x64-6.0.0.47.zip
           unzip -q toolchains-linux-x64-6.0.0.47.zip -d commandline-tools/sdk/default/openharmony
           rm toolchains-linux-x64-6.0.0.47.zip
 
