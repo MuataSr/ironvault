@@ -26,25 +26,26 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Download HarmonyOS SDK
+      - name: Download OpenHarmony SDK
         run: |
-          mkdir -p $HOME/harmonyos-sdk
-          cd $HOME/harmonyos-sdk
-          # Download command line tools
-          wget -q https://developer.huawei.com/consumer/en/sdk/command-line-tools-linux-5.0.3.XXX.zip
-          unzip -q command-line-tools-linux-*.zip
-          rm command-line-tools-linux-*.zip
-          mkdir -p command-line-tools/sdk/default/openharmony
+          mkdir -p $HOME/openharmony-sdk
+          cd $HOME/openharmony-sdk
+
+          # Download OpenHarmony command-line tools from Gitee
+          wget -q https://gitee.com/openharmony/commandline-tools/releases/download/v6.0.0/commandline-tools-linux-x64-6.0.0.47.zip
+          unzip -q commandline-tools-linux-x64-6.0.0.47.zip
+          rm commandline-tools-linux-x64-6.0.0.47.zip
+
           # Download toolchains
-          wget -q https://gitee.com/openharmony/commandline-tools/releases/download/v6.0.0/toolchains-linux-x64-6.0.0.47-Beta1.zip
-          unzip -q toolchains-linux-x64-*.zip -d command-line-tools/sdk/default/openharmony
-          rm toolchains-linux-x64-*.zip
+          mkdir -p commandline-tools/sdk/default/openharmony
+          wget -q https://gitee.com/openharmony/commandline-tools/releases/download/v6.0.0/toolchains-linux-x64-6.0.0.47.zip
+          unzip -q toolchains-linux-x64-6.0.0.47.zip -d commandline-tools/sdk/default/openharmony
+          rm toolchains-linux-x64-6.0.0.47.zip
 
       - name: Configure Environment
         run: |
-          export PATH=$HOME/harmonyos-sdk/command-line-tools/bin:$PATH
-          export NODE_HOME=$HOME/.nvm/versions/node/v18.*
-          export HDC_HOME=$HOME/harmonyos-sdk/command-line-tools/sdk/default/openharmony/toolchains
+          export PATH=$HOME/openharmony-sdk/commandline-tools/bin:$PATH
+          export HDC_HOME=$HOME/openharmony-sdk/commandline-tools/sdk/default/openharmony/toolchains
           echo "PATH=$PATH" >> $GITHUB_ENV
           echo "HDC_HOME=$HDC_HOME" >> $GITHUB_ENV
 
@@ -62,9 +63,8 @@ jobs:
         id: build
         run: |
           cd ${{ github.workspace }}
-          export PATH=$HOME/harmonyos-sdk/command-line-tools/bin:$PATH
-          export NODE_HOME=$HOME/.nvm/versions/node/v18.*
-          export HDC_HOME=$HOME/harmonyos-sdk/command-line-tools/sdk/default/openharmony/toolchains
+          export PATH=$HOME/openharmony-sdk/commandline-tools/bin:$PATH
+          export HDC_HOME=$HOME/openharmony-sdk/commandline-tools/sdk/default/openharmony/toolchains
 
           # Try to build
           if [ -f "hvigorw" ]; then
